@@ -104,7 +104,9 @@ frontend/src/
   pages/             dashboard, projects, suites, case editor, runs, reports, compare, profile, auth
   components/        layout, charts, tables, dialogs, UI primitives
 e2e/                 Playwright tests for the platform
-docs/                ARCHITECTURE.md (execution architecture), API.md (endpoints)
+docs/                USER_GUIDE.md (how to use the app), ARCHITECTURE.md (execution architecture), API.md (endpoints)
 ```
+
+**New users:** start with the [User Guide](docs/USER_GUIDE.md).
 
 More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/API.md](docs/API.md)
