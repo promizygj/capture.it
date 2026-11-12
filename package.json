@@ -1,0 +1,24 @@
+{
+  "name": "qa-testing-platform",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "e2e"
+  ],
+  "scripts": {
+    "infra:up": "docker compose up -d postgres redis",
+    "infra:down": "docker compose down",
+    "dev:api": "npm run dev -w backend",
+    "dev:worker": "npm run worker:dev -w backend",
+    "dev:web": "npm run dev -w frontend",
+    "test": "npm test -w backend",
+    "test:e2e": "npm test -w e2e",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "db:seed": "npm run db:seed -w backend",
+    "typecheck": "npm run typecheck -w backend && npm run build -w frontend"
+  },
+  "devDependencies": {
+    "wait-on": "^9.5.1"
+  }
+}

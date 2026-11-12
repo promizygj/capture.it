@@ -1,0 +1,4 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Slow page – Demo Shop</title><link rel="stylesheet" href="/demo/style.css"></head><body>
+<header><span class="brand">Demo Shop</span><a href="/demo/">Home</a><a href="/demo/products">Products</a><a href="/demo/contact">Contact</a><a href="/demo/login">Login</a><a href="/demo/cart">Cart (<span id="cart-count">0</span>)</a></header>
+<main><h1>Slow content</h1><div id="slow"></div></main><script>const cart=()=>JSON.parse(localStorage.getItem("cart")||"[]");document.getElementById("cart-count").textContent=cart().length;</script>
+<script>setTimeout(()=>{document.getElementById('slow').innerHTML='<p class="loaded">Loaded!</p>'},Math.random()<0.5?200:6000);</script></body></html>

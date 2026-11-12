@@ -1,0 +1,22 @@
+# Example: trigger a Capture.It run from another repository's pipeline and fail the build on test failures.
+# Store a project API key (Project → Settings → CI/CD) as the QA_PLATFORM_KEY secret.
+name: E2E via Capture.It
+on: [workflow_dispatch]
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      QA_URL: https://qa.example.com
+    steps:
+      - name: Trigger and wait
+        run: |
+          RUN=$(curl -sf -X POST "$QA_URL/api/ci/runs" -H "X-API-Key: ${{ secrets.QA_PLATFORM_KEY }}" -H "content-type: application/json" \
+            -d '{"environment":"staging","metadata":{"commit":"${{ github.sha }}","branch":"${{ github.ref_name }}"}}' | jq -r .runId)
+          echo "Report: $QA_URL/runs/$RUN"
+          for i in $(seq 1 180); do
+            S=$(curl -sf "$QA_URL/api/ci/runs/$RUN" -H "X-API-Key: ${{ secrets.QA_PLATFORM_KEY }}")
+            [ "$(echo "$S" | jq -r .done)" = "true" ] && break
+            sleep 5
+          done
+          echo "$S" | jq .
+          [ "$(echo "$S" | jq -r .success)" = "true" ]

@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Login – Demo Shop</title><link rel="stylesheet" href="/demo/style.css"></head><body>
+<header><span class="brand">Demo Shop</span><a href="/demo/">Home</a><a href="/demo/products">Products</a><a href="/demo/contact">Contact</a><a href="/demo/login">Login</a><a href="/demo/cart">Cart (<span id="cart-count">0</span>)</a></header>
+<main><h1>Sign in</h1><p>Use <code>demo@example.com</code> / <code>Password123</code></p>
+<form id="login-form"><input id="email" type="email" placeholder="Email" required><input id="password" type="password" placeholder="Password" required><button type="submit">Sign in</button><p class="error" id="login-error" hidden></p></form></main><script>const cart=()=>JSON.parse(localStorage.getItem("cart")||"[]");document.getElementById("cart-count").textContent=cart().length;</script>
+<script>document.getElementById('login-form').addEventListener('submit',e=>{e.preventDefault();
+if(email.value==='demo@example.com'&&password.value==='Password123'){sessionStorage.setItem('user','Demo User');setTimeout(()=>location.href='/demo/account',300)}
+else{const el=document.getElementById('login-error');el.textContent='Invalid email or password';el.hidden=false}});</script></body></html>

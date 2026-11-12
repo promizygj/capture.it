@@ -1,0 +1,9 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Checkout – Demo Shop</title><link rel="stylesheet" href="/demo/style.css"></head><body>
+<header><span class="brand">Demo Shop</span><a href="/demo/">Home</a><a href="/demo/products">Products</a><a href="/demo/contact">Contact</a><a href="/demo/login">Login</a><a href="/demo/cart">Cart (<span id="cart-count">0</span>)</a></header>
+<main><h1>Checkout</h1><button id="quick-add" type="button">Add Blue Widget</button>
+<form id="checkout"><input id="full-name" placeholder="Full name" required><input id="address" placeholder="Address" required><input id="card" placeholder="Card number" required><button id="place-order" type="submit">Place order</button><p class="error" id="checkout-error" hidden></p></form>
+<div class="order-confirmation card" hidden></div></main><script>const cart=()=>JSON.parse(localStorage.getItem("cart")||"[]");document.getElementById("cart-count").textContent=cart().length;</script>
+<script>document.getElementById('quick-add').onclick=()=>{const c=cart();c.push('Blue Widget');localStorage.setItem('cart',JSON.stringify(c));document.getElementById('cart-count').textContent=c.length};
+document.getElementById('checkout').addEventListener('submit',e=>{e.preventDefault();const err=document.getElementById('checkout-error');
+if(!cart().length){err.textContent='Your cart is empty';err.hidden=false;return}if(!/^\d{16}$/.test(card.value.replace(/\s/g,''))){err.textContent='Invalid card number';err.hidden=false;return}
+const conf=document.querySelector('.order-confirmation');conf.textContent='Thank you for your order, '+document.getElementById('full-name').value+'! Order #'+Math.floor(Math.random()*1e5);conf.hidden=false;e.target.hidden=true;localStorage.removeItem('cart')});</script></body></html>

@@ -1,0 +1,4 @@
+<!doctype html><html><head><meta charset="utf-8"><title>My account – Demo Shop</title><link rel="stylesheet" href="/demo/style.css"></head><body>
+<header><span class="brand">Demo Shop</span><a href="/demo/">Home</a><a href="/demo/products">Products</a><a href="/demo/contact">Contact</a><a href="/demo/login">Login</a><a href="/demo/cart">Cart (<span id="cart-count">0</span>)</a></header>
+<main><h1>My account</h1><p class="user-menu">Signed in as <b id="user-name"></b></p></main><script>const cart=()=>JSON.parse(localStorage.getItem("cart")||"[]");document.getElementById("cart-count").textContent=cart().length;</script>
+<script>const u=sessionStorage.getItem('user');if(!u)location.href='/demo/login';else document.getElementById('user-name').textContent=u;</script></body></html>

@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+storage/
+coverage
+test-results
+playwright-report
+*.log
+storage-test/

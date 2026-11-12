@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Products – Demo Shop</title><link rel="stylesheet" href="/demo/style.css"></head><body>
+<header><span class="brand">Demo Shop</span><a href="/demo/">Home</a><a href="/demo/products">Products</a><a href="/demo/contact">Contact</a><a href="/demo/login">Login</a><a href="/demo/cart">Cart (<span id="cart-count">0</span>)</a></header>
+<main><h1>Products</h1><div class="products">
+<div class="card"><h3>Blue Widget</h3><p>$19.99</p><button data-testid="add-to-cart" data-name="Blue Widget">Add to cart</button></div>
+<div class="card"><h3>Gadget Pro</h3><p>$49.00</p><button data-testid="add-to-cart" data-name="Gadget Pro">Add to cart</button></div>
+</div><p id="toast" class="success" hidden></p></main><script>const cart=()=>JSON.parse(localStorage.getItem("cart")||"[]");document.getElementById("cart-count").textContent=cart().length;</script>
+<script>document.querySelectorAll('[data-testid=add-to-cart]').forEach(b=>b.addEventListener('click',()=>{const c=cart();c.push(b.dataset.name);localStorage.setItem('cart',JSON.stringify(c));
+document.getElementById('cart-count').textContent=c.length;const t=document.getElementById('toast');t.textContent=b.dataset.name+' added to cart';t.hidden=false}));</script></body></html>

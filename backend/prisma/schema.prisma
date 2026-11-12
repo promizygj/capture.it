@@ -1,0 +1,283 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MemberRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RunStatus {
+  QUEUED
+  RUNNING
+  PASSED
+  FAILED
+  ERROR
+  CANCELLED
+}
+
+enum ResultStatus {
+  PENDING
+  RUNNING
+  PASSED
+  FAILED
+  SKIPPED
+  ERROR
+}
+
+enum RunTrigger {
+  MANUAL
+  SCHEDULE
+  CI
+}
+
+enum BrowserName {
+  chromium
+  firefox
+  webkit
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  passwordChangedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships  ProjectMember[]
+  resetTokens  PasswordResetToken[]
+  runs         TestRun[]        @relation("TriggeredBy")
+  apiKeys      ApiKey[]
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  baseUrl         String
+  defaultBrowsers BrowserName[] @default([chromium])
+  maxParallel     Int      @default(3)
+  retries         Int      @default(0)
+  notifyEmail     Boolean  @default(true)
+  slackWebhookUrl String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  members      ProjectMember[]
+  environments Environment[]
+  suites       TestSuite[]
+  runs         TestRun[]
+  schedules    Schedule[]
+  apiKeys      ApiKey[]
+  baselines    VisualBaseline[]
+}
+
+model ProjectMember {
+  id        String     @id @default(cuid())
+  projectId String
+  userId    String
+  role      MemberRole @default(VIEWER)
+  createdAt DateTime   @default(now())
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+/// development / staging / production etc. Overrides the base URL and supplies variables.
+model Environment {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  baseUrl   String
+  variables Json     @default("{}")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  runs      TestRun[]
+  schedules Schedule[]
+
+  @@unique([projectId, name])
+}
+
+model TestSuite {
+  id          String     @id @default(cuid())
+  projectId   String
+  name        String
+  description String?
+  category    String     @default("General")
+  enabled     Boolean    @default(true)
+  position    Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  cases       TestCase[]
+  runs        TestRun[]
+  schedules   Schedule[]
+
+  @@index([projectId])
+}
+
+model TestCase {
+  id             String   @id @default(cuid())
+  suiteId        String
+  name           String
+  description    String?
+  /// Template key, e.g. "page-load", "login", "form-validation", "custom-steps", "api-request", "visual-regression"
+  template       String
+  /// Target URL; may be relative to the environment base URL (e.g. "/login")
+  targetUrl      String   @default("/")
+  /// Template parameters (credentials, selectors, request body, ...)
+  config         Json     @default("{}")
+  /// Ordered list of executable steps { action, selector?, value? }
+  steps          Json     @default("[]")
+  /// Ordered list of assertions { type, selector?, value? }
+  expectations   Json     @default("[]")
+  expectedResult String?
+  priority       Priority @default(MEDIUM)
+  timeoutMs      Int      @default(30000)
+  enabled        Boolean  @default(true)
+  position       Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  suite          TestSuite    @relation(fields: [suiteId], references: [id], onDelete: Cascade)
+  results        TestResult[]
+  baselines      VisualBaseline[]
+
+  @@index([suiteId])
+}
+
+model TestRun {
+  id            String     @id @default(cuid())
+  projectId     String
+  suiteId       String?
+  environmentId String?
+  triggeredById String?
+  trigger       RunTrigger @default(MANUAL)
+  status        RunStatus  @default(QUEUED)
+  browsers      BrowserName[]
+  total         Int        @default(0)
+  passed        Int        @default(0)
+  failed        Int        @default(0)
+  skipped       Int        @default(0)
+  flaky         Int        @default(0)
+  errorMessage  String?
+  ciMetadata    Json?
+  queuedAt      DateTime   @default(now())
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  durationMs    Int?
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  suite         TestSuite?   @relation(fields: [suiteId], references: [id], onDelete: SetNull)
+  environment   Environment? @relation(fields: [environmentId], references: [id], onDelete: SetNull)
+  triggeredBy   User?        @relation("TriggeredBy", fields: [triggeredById], references: [id], onDelete: SetNull)
+  results       TestResult[]
+
+  @@index([projectId, queuedAt])
+  @@index([status])
+}
+
+model TestResult {
+  id              String       @id @default(cuid())
+  runId           String
+  testCaseId      String?
+  /// Snapshot of the case name/suite at execution time so history survives edits/deletes
+  testCaseName    String
+  suiteName       String
+  template        String
+  browser         BrowserName
+  browserVersion  String?
+  status          ResultStatus @default(PENDING)
+  attempts        Int          @default(0)
+  isFlaky         Boolean      @default(false)
+  startedAt       DateTime?
+  finishedAt      DateTime?
+  durationMs      Int?
+  errorMessage    String?
+  errorStack      String?
+  screenshotPath  String?
+  /// Visual regression: diff image + percentage of differing pixels
+  diffPath        String?
+  diffRatio       Float?
+  logs            Json         @default("[]")
+  consoleErrors   Json         @default("[]")
+  networkFailures Json         @default("[]")
+  metrics         Json?
+  aiAnalysis      String?
+  run             TestRun      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  testCase        TestCase?    @relation(fields: [testCaseId], references: [id], onDelete: SetNull)
+
+  @@index([runId])
+  @@index([testCaseId, startedAt])
+}
+
+model VisualBaseline {
+  id         String      @id @default(cuid())
+  projectId  String
+  testCaseId String
+  browser    BrowserName
+  imagePath  String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testCase   TestCase    @relation(fields: [testCaseId], references: [id], onDelete: Cascade)
+
+  @@unique([testCaseId, browser])
+}
+
+model Schedule {
+  id            String       @id @default(cuid())
+  projectId     String
+  suiteId       String?
+  environmentId String?
+  name          String
+  cron          String
+  timezone      String       @default("UTC")
+  browsers      BrowserName[] @default([chromium])
+  enabled       Boolean      @default(true)
+  lastRunAt     DateTime?
+  createdAt     DateTime     @default(now())
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  suite         TestSuite?   @relation(fields: [suiteId], references: [id], onDelete: Cascade)
+  environment   Environment? @relation(fields: [environmentId], references: [id], onDelete: SetNull)
+}
+
+/// Project-scoped keys for CI/CD triggers (only a hash is stored)
+model ApiKey {
+  id          String    @id @default(cuid())
+  projectId   String
+  createdById String
+  name        String
+  prefix      String
+  keyHash     String    @unique
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+}

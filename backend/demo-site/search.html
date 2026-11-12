@@ -1,0 +1,5 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Search – Demo Shop</title><link rel="stylesheet" href="/demo/style.css"></head><body>
+<header><span class="brand">Demo Shop</span><a href="/demo/">Home</a><a href="/demo/products">Products</a><a href="/demo/contact">Contact</a><a href="/demo/login">Login</a><a href="/demo/cart">Cart (<span id="cart-count">0</span>)</a></header>
+<main><h1>Search results</h1><div id="results"></div></main><script>const cart=()=>JSON.parse(localStorage.getItem("cart")||"[]");document.getElementById("cart-count").textContent=cart().length;</script>
+<script>const q=new URLSearchParams(location.search).get('q')||'';const items=['Blue Widget','Red Widget','Gadget Pro','Gizmo'];
+document.getElementById('results').innerHTML=items.filter(i=>i.toLowerCase().includes(q.toLowerCase())).map(i=>'<div class="card result">'+i+'</div>').join('')||'<p>No results</p>';</script></body></html>

@@ -1,0 +1,41 @@
+# Production stack: Postgres, Redis, API (serves the web app) and scalable Playwright workers.
+#   cp .env.production.example .env.production && docker compose -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.prod.yml up -d --scale worker=3
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: qa, POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-qa}", POSTGRES_DB: qa_platform }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U qa"], interval: 5s, retries: 10 }
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redisdata:/data]
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 5s, retries: 10 }
+    restart: unless-stopped
+  api:
+    build: .
+    env_file: .env.production
+    environment:
+      DATABASE_URL: postgresql://qa:${POSTGRES_PASSWORD:-qa}@postgres:5432/qa_platform
+      REDIS_URL: redis://redis:6379
+    ports: ["${PORT:-8080}:4100"]
+    volumes: [artifacts:/data/storage]
+    depends_on: { postgres: { condition: service_healthy }, redis: { condition: service_healthy } }
+    restart: unless-stopped
+  worker:
+    build: .
+    command: ["node", "dist/worker.js"]
+    env_file: .env.production
+    environment:
+      DATABASE_URL: postgresql://qa:${POSTGRES_PASSWORD:-qa}@postgres:5432/qa_platform
+      REDIS_URL: redis://redis:6379
+    volumes: [artifacts:/data/storage]
+    shm_size: 1gb
+    depends_on: { api: { condition: service_healthy } }
+    restart: unless-stopped
+volumes:
+  pgdata:
+  redisdata:
+  artifacts:

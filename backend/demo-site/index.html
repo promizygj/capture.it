@@ -1,0 +1,5 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Demo Shop – Home</title><link rel="stylesheet" href="/demo/style.css"></head><body>
+<header><span class="brand">Demo Shop</span><a href="/demo/">Home</a><a href="/demo/products">Products</a><a href="/demo/contact">Contact</a><a href="/demo/login">Login</a><a href="/demo/cart">Cart (<span id="cart-count">0</span>)</a></header>
+<main><h1>Welcome to the Demo Shop</h1><p>A sample website used to try out Capture.It's test templates.</p>
+<form id="search" onsubmit="event.preventDefault();location.href='/demo/search?q='+encodeURIComponent(this.q.value)"><input type="search" name="q" placeholder="Search products"></form>
+</main><script>const cart=()=>JSON.parse(localStorage.getItem("cart")||"[]");document.getElementById("cart-count").textContent=cart().length;</script></body></html>

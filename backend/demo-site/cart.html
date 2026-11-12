@@ -1,0 +1,4 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Cart – Demo Shop</title><link rel="stylesheet" href="/demo/style.css"></head><body>
+<header><span class="brand">Demo Shop</span><a href="/demo/">Home</a><a href="/demo/products">Products</a><a href="/demo/contact">Contact</a><a href="/demo/login">Login</a><a href="/demo/cart">Cart (<span id="cart-count">0</span>)</a></header>
+<main><h1>Your cart</h1><div id="items"></div><a href="/demo/checkout" id="checkout-link">Proceed to checkout</a></main><script>const cart=()=>JSON.parse(localStorage.getItem("cart")||"[]");document.getElementById("cart-count").textContent=cart().length;</script>
+<script>document.getElementById('items').innerHTML=cart().map(i=>'<div class="card cart-item">'+i+'</div>').join('')||'<p>Your cart is empty</p>';</script></body></html>
