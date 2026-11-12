@@ -77,3 +77,33 @@ body { @apply bg-bg text-ink font-sans antialiased; }
   & td { @apply px-4 py-3 border-b border-line align-middle; }
   & tr:last-child td { @apply border-b-0; }
 }
+
+/* User guide (rendered Markdown from docs/USER_GUIDE.md) */
+.guide { @apply text-[15px] leading-7 text-ink-2; }
+.guide :is(h1, h2, h3, h4) { @apply scroll-mt-20 font-semibold tracking-tight text-ink; }
+.guide h1 { @apply mt-12 mb-4 border-b border-line pb-2 text-2xl; }
+.guide > h1:first-child { @apply mt-0 text-3xl; }
+.guide h2 { @apply mt-10 mb-3 text-xl; }
+.guide h3 { @apply mt-8 mb-2 text-lg; }
+.guide h4 { @apply mt-6 mb-2 text-base; }
+.guide p { @apply my-3; }
+.guide :is(ul, ol) { @apply my-3 pl-6; }
+.guide ul { @apply list-disc; }
+.guide ol { @apply list-decimal; }
+.guide li { @apply my-1; }
+.guide li > :is(ul, ol) { @apply my-1; }
+.guide a { @apply font-medium text-primary underline-offset-2 hover:underline; }
+.guide strong { @apply font-semibold text-ink; }
+.guide hr { @apply my-10 border-line; }
+.guide code { @apply rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[0.85em] text-ink break-words; }
+.guide pre { @apply my-4 overflow-x-auto rounded-lg border border-line bg-surface-2 p-4 text-sm leading-6; }
+.guide pre code { @apply bg-transparent p-0 text-[0.9em]; }
+.guide blockquote { @apply my-4 rounded-r-lg border-l-4 border-primary bg-primary-soft px-4 py-2 text-ink; }
+.guide blockquote p { @apply my-1; }
+.guide-table { @apply my-4 overflow-x-auto rounded-lg border border-line; }
+.guide-table table { @apply w-full border-collapse text-sm leading-6; }
+.guide-table th { @apply whitespace-nowrap border-b border-line bg-surface-2 px-3 py-2 text-left font-semibold text-ink; }
+.guide-table td { @apply border-b border-line px-3 py-2 align-top; }
+.guide-table tr:last-child td { @apply border-b-0; }
+.guide .contains-task-list { @apply list-none pl-1; }
+.guide .task-list-item input { @apply mr-2 align-middle accent-primary; }

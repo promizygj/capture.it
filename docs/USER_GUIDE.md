@@ -74,9 +74,11 @@ A project is one website you want to test.
 
 1. In the sidebar, click **Projects**, then **New project**.
 2. Fill in:
-   - **Name**: `Example Shop`
+   - **Project name**: `Example Shop`
    - **Website URL**: `https://www.example-shop.com`
    - **Description** (optional): `Public online shop`
+   - The same form also has **Default browsers**, **Retries for failed tests**, **Parallel tests** and
+     **Environments**. You can leave them as they are and change them later.
 3. Click **Create project**.
 
 The project page opens. Its tabs:
@@ -394,7 +396,7 @@ Invite colleagues so they can see results, write tests and receive failure email
 
 1. Open your project and click the **Settings** tab.
 2. In the **Team** box:
-   - Type your colleague's email in the **colleague@company.com** field.
+   - Type your colleague's email in the email field (it shows `colleague@company.com`).
    - Choose their role.
    - Click **Add**.
 3. The colleague must already have a Capture.It account. If they don't, you'll see *"No user with

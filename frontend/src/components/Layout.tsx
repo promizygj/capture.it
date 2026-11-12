@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import { FolderKanban, History, LayoutDashboard, LogOut, Menu, UserCircle, X } from 'lucide-react';
+import { BookOpen, FolderKanban, History, LayoutDashboard, LogOut, Menu, UserCircle, X } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store';
 import { useLogoutMutation } from '../store/api';
 import { loggedOut } from '../store/authSlice';
@@ -10,6 +10,7 @@ const NAV = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { to: '/projects', label: 'Projects', Icon: FolderKanban },
   { to: '/runs', label: 'Execution history', Icon: History },
+  { to: '/guide', label: 'User guide', Icon: BookOpen },
 ];
 
 export function Logo() {

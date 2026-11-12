@@ -80,6 +80,7 @@ export const router = createBrowserRouter([
           { path: '/runs/:runId', element: <RunPage /> },
           { path: '/results/:resultId', lazy: async () => ({ Component: (await import('./pages/ResultPage')).ResultPage }) },
           { path: '/profile', element: <ProfilePage /> },
+          { path: '/guide', lazy: async () => ({ Component: (await import('./pages/GuidePage')).GuidePage }) },
           { path: '*', element: <Navigate to="/dashboard" replace /> },
         ],
       },

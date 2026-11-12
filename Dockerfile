@@ -11,6 +11,7 @@ COPY e2e/package.json e2e/
 RUN npm ci --ignore-scripts
 COPY backend backend
 COPY frontend frontend
+COPY docs docs
 RUN npm run build -w frontend && npm run build -w backend && npm prune --omit=dev
 
 FROM mcr.microsoft.com/playwright:v1.65.0-noble AS runtime
